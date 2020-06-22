@@ -1,0 +1,41 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.jetherrodrigues.store",
+      "nativeLanguage": "en"
+    },
+    "jhipsterVersion": "6.8.0",
+    "applicationType": "microservice",
+    "baseName": "store",
+    "packageName": "com.jetherrodrigues.store",
+    "packageFolder": "com/jetherrodrigues/store",
+    "serverPort": "8082",
+    "authenticationType": "oauth2",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": "elasticsearch",
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "MTJlZTE2OTA5MzU2NDY2NWZhMzUwNTM0OTUwMmNiY2QyYjk1ZDg5MzUxYTk0ZWRiOTM0YzBkMjMxMDRmOWU0YWQ4ODZhMzMwZTczYzMwMmYxMjM4YTgyNjRlNWVjNjIxZDA0ZWM4YmVmNDAzMjNlNDQwYzI4MTAyMmFkODlkNjQ=",
+    "embeddableLaunchScript": false,
+    "creationTimestamp": 1592852504748,
+    "testFrameworks": ["gatling", "cucumber"],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "clientPackageManager": "npm",
+    "nativeLanguage": "en",
+    "languages": ["en", "pt-br"],
+    "blueprints": [],
+    "skipClient": true,
+    "skipUserManagement": true
+  }
+}
