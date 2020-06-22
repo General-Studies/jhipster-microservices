@@ -1,7 +1,6 @@
 # Blog Service
 
-### Which *type* of application would you like to create? Microservice application
-
+0. Which *type* of application would you like to create? `Microservice application`
 1. [Alpha] Do you want to make it reactive with Spring WebFlux? `No`
 2. What is the base name of your application? `blog`
 3. As you are running in a microservice architecture, on which port would like your server to run? It should be unique to avoid port confli
@@ -24,8 +23,7 @@ cts. `8081`
 
 # Store Service
 
-### Which *type* of application would you like to create? Microservice application
-
+0. Which *type* of application would you like to create? `Microservice application`
 1. [Alpha] Do you want to make it reactive with Spring WebFlux? `No`
 2. What is the base name of your application? `store`
 3. As you are running in a microservice architecture, on which port would like your server to run? It should be unique to avoid port confli
@@ -70,6 +68,37 @@ Perform that commands, the Jipster Registry will be supported by java version 8 
 
 1. cd registry && ./mvnw
 
-# Keycloak
+# Docker Services
 
-# Postgres + PgAdmin4
+Before to execute the services deploy, its need execute the script bellow (this script work only to Linux based operation system):
+`cd ./docker && sh create-volumes-to-docker-service.sh`
+
+## Deploy
+
+1. `cd ./docker`
+2. `sh deploy-services.sh`
+
+## Undeploy
+
+1. `cd ./docker`
+2. `sh undeploy-services.sh`
+
+### Keycloak
+
+`keycloak.yml`
+
+The directory `realm-config` contains the realm will be imported to Keycloak on startup.
+
+Its necessary add an configration to `/etc/hosts` to allow use Keycloak inside Docker.
+
+```sh
+127.0.0.1	keycloak
+```
+
+### Postgres + PgAdmin4
+
+`postgres.yml`
+
+### MongoDB + MongoExpress
+
+`mongodb.yml`
