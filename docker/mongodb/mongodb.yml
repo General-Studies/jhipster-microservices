@@ -1,0 +1,43 @@
+version: '3.2'
+services:
+  #===================================================================
+  # MONGO DATABASE AND MONGO EXPRESS
+  # https://hub.docker.com/_/mongo
+  # https://hub.docker.com/_/mongo-express
+  #===================================================================  
+  mongo-image-express:
+    image: mongo-express:0.49.0
+    ports:
+      - 18082:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: teste
+      ME_CONFIG_BASICAUTH_PASSWORD: teste
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    networks:
+      - proxy
+    restart: on-failure
+
+  mongo-image:
+    image: mongo:3.6
+    restart: on-failure
+    ports: 
+      - "27017:27017"
+    volumes:
+      - /opt/volumes/mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
