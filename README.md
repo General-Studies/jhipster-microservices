@@ -51,6 +51,25 @@ cts. `8082`
 
 # Jhipster Registry
 
+https://github.com/jhipster/jhipster-registry
+
+### Config before run
+
+1. open `pom.xml`
+2. change `<java.version>11</java.version>` to `<java.version>8</java.version>`
+3. find `<release>${java.version}</release>` and comment this line
+
+Perform that commands, the Jipster Registry will be supported by java version 8 instead version 11 (recommend use version 11 because, in soon, the support to java 8 will be removed)
+
+### Clone, install and run
+
+1. `git clone https://github.com/jhipster/jhipster-registry.git registry` 
+2. cd registry && npm install && ./mvnw
+
+### Run if already exist
+
+1. cd registry && ./mvnw
+
 # Keycloak
 
 # Postgres + PgAdmin4
