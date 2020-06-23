@@ -1,0 +1,311 @@
+version: '3.4'
+services:
+  #########################################
+  #  JHipster Registry                    #
+  #########################################
+  jhipster-registry:
+    image: jhipster/jhipster-registry:v6.1.2
+    volumes:
+      - ./central-server-config:/central-config
+    # By default the JHipster Registry runs with the "dev" and "native"
+    # Spring profiles.
+    # "native" profile means the filesystem is used to store data, see
+    # http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=dev,oauth2
+      - SPRING_SECURITY_USER_PASSWORD=admin
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+      - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native
+      - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_LOCATIONS=file:./central-config
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=git
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_URI=https://github.com/jhipster/jhipster-registry/
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_PATHS=central-config
+      # For Keycloak to work, you need to add '127.0.0.1 keycloak' to your hosts file
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=jhipster-registry
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=jhipster-registry
+    ports:
+      - 8761:8761
+    networks: 
+      - proxy
+    restart: on-failure
+    depends_on:
+      - keycloak
+    links:
+      - keycloak
+  
+  ###########################################################
+  #  Blog Service, ElasticSearch and service Database       #
+  ###########################################################
+  blog:
+    image: blog
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+      - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://blog-postgresql:5432/blog'
+      - 'SPRING_DATASOURCE_USERNAME=blog'
+      - 'SPRING_DATASOURCE_PASSWORD=blog@123'
+      - 'SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster'
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=internal
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=internal
+      - JHIPSTER_SLEEP=30
+      - 'SPRING_DATA_JEST_URI=http://blog-elasticsearch:9200'
+      - 'SPRING_ELASTICSEARCH_REST_URIS=http://blog-elasticsearch:9200'
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+    networks: 
+      - proxy
+    depends_on: 
+      - blog-postgresql
+      - blog-elasticsearch
+    restart: on-failure
+
+  blog-elasticsearch:
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:6.8.6'
+    environment:
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - discovery.type=single-node
+    restart: on-failure
+    networks: 
+      - proxy
+    volumes: 
+      - /opt/volumes/els:/usr/share/elasticsearch/data
+
+  blog-postgresql:    
+    image: nucleotempestade/postgres-postgis:12.0
+    volumes:
+      - /opt/volumes/pg12:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: blog
+      POSTGRES_USER: blog
+      POSTGRES_PASS: blog@123
+      ALLOW_IP_RANGE: 0.0.0.0/0
+      POSTGRES_MULTIPLE_EXTENSIONS: postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    ports:
+      - "25432:5432"
+    restart: on-failure
+    healthcheck:
+      test: "exit 0"
+    networks: 
+      - proxy      
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    ports:
+      - "5555:80"
+    environment:
+        PGADMIN_DEFAULT_EMAIL: "teste@teste.com"
+        PGADMIN_DEFAULT_PASSWORD: "test#"
+    volumes:
+      - /opt/volumes/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - blog-postgresql
+    networks: 
+      - proxy
+
+  #########################################
+  #  Gateway Service and your Database    #
+  #########################################    
+  gateway:
+    image: gateway
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+      - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+      - 'SPRING_DATA_MONGODB_URI=mongodb://root:root@gateway-mongodb:27017'
+      - SPRING_DATA_MONGODB_DATABASE=gateway
+      - 'SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster'
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=web_app
+      - JHIPSTER_SLEEP=30
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+    ports:
+      - '8080:8080'
+    networks: 
+      - proxy
+    depends_on: 
+      - gateway-mongodb
+    restart: on-failure
+
+  gateway-mongodb:
+    image: 'mongo:4.2.3'
+    restart: on-failure
+    ports: 
+      - "27017"
+    volumes:
+      - /opt/volumes/mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - proxy
+
+  gateway-mongodb-express:
+    image: mongo-express:0.54.0
+    ports:
+      - 18082:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: teste
+      ME_CONFIG_BASICAUTH_PASSWORD: teste
+      ME_CONFIG_MONGODB_SERVER: gateway-mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    depends_on:
+      - gateway-mongodb
+    links:
+      - gateway-mongodb
+    networks:
+      - proxy
+    restart: on-failure    
+
+  #########################################
+  #  Store Service and your Database      #
+  #########################################
+  store:
+    image: store
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+      - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+      - 'SPRING_DATA_MONGODB_URI=mongodb://root:root@store-mongodb:27017/store?authSource=admin&authMechanism=SCRAM-SHA-1'
+      #- SPRING_DATA_MONGODB_DATABASE=store
+      - 'SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster'
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=internal
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=internal
+      - JHIPSTER_SLEEP=30
+      - 'SPRING_DATA_JEST_URI=http://store-elasticsearch:9200'
+      - 'SPRING_ELASTICSEARCH_REST_URIS=http://store-elasticsearch:9200'
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+    networks: 
+      - proxy
+    depends_on: 
+      - store-mongodb
+      - store-elasticsearch
+    restart: on-failure
+  
+  store-mongodb:
+    image: 'mongo:4.2.3'
+    restart: on-failure
+    ports: 
+      - "27017"
+    volumes:
+      - /opt/volumes/mongodb2:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - proxy
+
+  store-mongodb-express:
+    image: mongo-express:0.54.0
+    ports:
+      - 18083:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: teste
+      ME_CONFIG_BASICAUTH_PASSWORD: teste
+      ME_CONFIG_MONGODB_SERVER: store-mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    depends_on:
+      - store-mongodb
+    links:
+      - store-mongodb
+    networks:
+      - proxy
+    restart: on-failure
+
+  store-elasticsearch:
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:6.8.6'
+    environment:
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - discovery.type=single-node
+    restart: on-failure
+    networks: 
+      - proxy
+    volumes: 
+      - /opt/volumes/els2:/usr/share/elasticsearch/data
+  
+  #########################################
+  #  Keycloak and Postgres to Keycloak    #
+  #########################################
+  keycloak-postgresql:    
+    image: nucleotempestade/postgres-postgis:12.0
+    volumes:
+      - /opt/volumes/keycloak/db:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      ALLOW_IP_RANGE: 0.0.0.0/0
+      POSTGRES_MULTIPLE_EXTENSIONS: postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    ports:
+      - "15432:5432"
+    restart: on-failure
+    healthcheck:
+      test: "exit 0"
+    networks: 
+      - proxy
+    restart: always    
+  keycloak-pgadmin4:
+    image: dpage/pgadmin4
+    ports:
+      - "5556:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "teste@teste.com"
+      PGADMIN_DEFAULT_PASSWORD: "test#"
+    volumes:
+      - /opt/volumes/keycloak/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - keycloak-postgresql
+    networks: 
+      - proxy
+    restart: always
+  keycloak:
+    image: jboss/keycloak:10.0.0
+    command:
+      [
+        '-b',
+        '0.0.0.0',
+        '-Dkeycloak.migration.action=import',
+        '-Dkeycloak.migration.provider=dir',
+        '-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config',
+        #'-Dkeycloak.migration.strategy=OVERWRITE_EXISTING',
+        '-Dkeycloak.migration.strategy=IGNORE_EXISTING',        
+        '-Djboss.socket.binding.port-offset=1000',
+        '-Dkeycloak.profile.feature.upload_scripts=enabled',
+      ]
+    volumes:
+      - ./realm-config:/opt/jboss/keycloak/realm-config
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-postgresql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+      - "9080:9080"
+      - "9443:9443"
+      - "10990:10990"
+    depends_on:
+      - keycloak-postgresql
+    networks: 
+      - proxy
+    restart: always
+####################################################
+networks: 
+  proxy:
+    external: true
