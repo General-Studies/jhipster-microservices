@@ -5,6 +5,9 @@ import com.jetherrodrigues.store.config.TestSecurityConfiguration;
 import com.jetherrodrigues.store.domain.Product;
 import com.jetherrodrigues.store.repository.ProductRepository;
 import com.jetherrodrigues.store.repository.search.ProductSearchRepository;
+import com.jetherrodrigues.store.service.ProductService;
+import com.jetherrodrigues.store.service.dto.ProductDTO;
+import com.jetherrodrigues.store.service.mapper.ProductMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,12 @@ public class ProductResourceIT {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Autowired
+    private ProductService productService;
 
     /**
      * This repository is mocked in the com.jetherrodrigues.store.repository.search test package.
@@ -107,9 +116,10 @@ public class ProductResourceIT {
         int databaseSizeBeforeCreate = productRepository.findAll().size();
 
         // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
         restProductMockMvc.perform(post("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Product in the database
@@ -131,11 +141,12 @@ public class ProductResourceIT {
 
         // Create the Product with an existing ID
         product.setId("existing_id");
+        ProductDTO productDTO = productMapper.toDto(product);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProductMockMvc.perform(post("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Product in the database
@@ -154,10 +165,11 @@ public class ProductResourceIT {
         product.setSku(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         restProductMockMvc.perform(post("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isBadRequest());
 
         List<Product> productList = productRepository.findAll();
@@ -171,10 +183,11 @@ public class ProductResourceIT {
         product.setName(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         restProductMockMvc.perform(post("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isBadRequest());
 
         List<Product> productList = productRepository.findAll();
@@ -188,10 +201,11 @@ public class ProductResourceIT {
         product.setPrice(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         restProductMockMvc.perform(post("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isBadRequest());
 
         List<Product> productList = productRepository.findAll();
@@ -251,10 +265,11 @@ public class ProductResourceIT {
             .name(UPDATED_NAME)
             .observation(UPDATED_OBSERVATION)
             .price(UPDATED_PRICE);
+        ProductDTO productDTO = productMapper.toDto(updatedProduct);
 
         restProductMockMvc.perform(put("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedProduct)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isOk());
 
         // Validate the Product in the database
@@ -275,11 +290,12 @@ public class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
 
         // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProductMockMvc.perform(put("/api/products").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(product)))
+            .content(TestUtil.convertObjectToJsonBytes(productDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Product in the database

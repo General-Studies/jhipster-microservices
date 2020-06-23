@@ -5,4 +5,7 @@ entity Product {
     price BigDecimal required
 }
 
+dto * with mapstruct
+service all with serviceImpl
+
 microservice Product with store
