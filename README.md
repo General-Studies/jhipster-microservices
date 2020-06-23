@@ -117,6 +117,8 @@ microservice Post with blog
 microservice Tag with blog
 ```
 
+![Eureka](https://github.com/General-Studies/jhipster-microservices/blob/master/blog/blog.png)
+
 # Store Service
 
 0. Which *type* of application would you like to create? `Microservice application`
@@ -155,6 +157,9 @@ entity Product {
 
 microservice Product with store
 ```
+
+![Eureka](https://github.com/General-Studies/jhipster-microservices/blob/master/store/store.png)
+
 
 # Gateway Service
 
