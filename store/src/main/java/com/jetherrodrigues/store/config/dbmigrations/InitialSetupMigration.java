@@ -1,14 +1,11 @@
 package com.jetherrodrigues.store.config.dbmigrations;
 
-import com.jetherrodrigues.store.domain.Authority;
-import com.jetherrodrigues.store.domain.User;
-import com.jetherrodrigues.store.security.AuthoritiesConstants;
-
 import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import com.jetherrodrigues.store.domain.Authority;
+import com.jetherrodrigues.store.security.AuthoritiesConstants;
 
-import java.time.Instant;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * Creates the initial database setup.
