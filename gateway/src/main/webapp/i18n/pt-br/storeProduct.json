@@ -1,0 +1,29 @@
+{
+  "gatewayApp": {
+    "storeProduct": {
+      "home": {
+        "title": "Products",
+        "createLabel": "Criar novo Product",
+        "createOrEditLabel": "Criar ou editar Product",
+        "notFound": "Nenhum Product encontrado"
+      },
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Product {{ id }}?"
+      },
+      "detail": {
+        "title": "Product"
+      },
+      "sku": "Sku",
+      "name": "Name",
+      "observation": "Observation",
+      "price": "Price"
+    }
+  },
+  "storeApp": {
+    "storeProduct": {
+      "created": "Um novo Product foi criado com o identificador {{ param }}",
+      "updated": "Um Product foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Product foi excluído com o identificador {{ param }}"
+    }
+  }
+}

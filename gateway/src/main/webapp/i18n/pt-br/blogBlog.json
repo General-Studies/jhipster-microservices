@@ -1,0 +1,28 @@
+{
+  "gatewayApp": {
+    "blogBlog": {
+      "home": {
+        "title": "Blogs",
+        "createLabel": "Criar novo Blog",
+        "createOrEditLabel": "Criar ou editar Blog",
+        "notFound": "Nenhum Blog encontrado"
+      },
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Blog {{ id }}?"
+      },
+      "detail": {
+        "title": "Blog"
+      },
+      "name": "Name",
+      "handle": "Handle",
+      "user": "User"
+    }
+  },
+  "blogApp": {
+    "blogBlog": {
+      "created": "Um novo Blog foi criado com o identificador {{ param }}",
+      "updated": "Um Blog foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Blog foi excluído com o identificador {{ param }}"
+    }
+  }
+}
