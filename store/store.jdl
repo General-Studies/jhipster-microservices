@@ -1,0 +1,8 @@
+entity Product {
+    sku String required minlength(5) unique
+    name String required minlength(3)
+    observation String maxlength(256)
+    price BigDecimal required
+}
+
+microservice Product with store
