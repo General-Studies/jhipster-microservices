@@ -1,3 +1,6 @@
+# Microservice Architecture Diagram
+
+![Eureka](https://www.jhipster.tech/images/microservices_architecture_detail.001.png)
 
 # Jhipster Registry
 
