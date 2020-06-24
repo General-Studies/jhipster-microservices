@@ -201,8 +201,6 @@ cts. `8080`
 0. Which *type* of application would you like to deploy? `Microservice application`
 1. Which *type* of gateway would you like to use? `JHipster gateway based on Netflix Zuul`
 2. Enter the root directory where your gateway(s) and microservices are located `../`
-
-`3 applications found at /mnt/hd/dev/general/java/jhipster/jhipster-microservices/`
 3. Which applications do you want to include in your configuration? `blog, gateway, store`
 4. Which applications do you want to use with clustered databases (only available with MongoDB and Couchbase)? (Press <space> to select, <a
 > to toggle all, <i> to invert selection) `Nothing`
