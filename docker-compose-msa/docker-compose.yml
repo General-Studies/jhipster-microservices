@@ -117,7 +117,7 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
       - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
-      - 'SPRING_DATA_MONGODB_URI=mongodb://root:root@gateway-mongodb:27017'
+      - 'SPRING_DATA_MONGODB_URI=mongodb://gateway-mongodb:27017'
       - SPRING_DATA_MONGODB_DATABASE=gateway
       - 'SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster'
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
@@ -139,9 +139,6 @@ services:
       - "27017"
     volumes:
       - /opt/volumes/mongodb:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
     networks:
       - proxy
 
@@ -154,8 +151,6 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: teste
       ME_CONFIG_MONGODB_SERVER: gateway-mongodb
       ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: root
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
     depends_on:
       - gateway-mongodb
@@ -176,8 +171,8 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
       - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
-      - 'SPRING_DATA_MONGODB_URI=mongodb://root:root@store-mongodb:27017/store?authSource=admin&authMechanism=SCRAM-SHA-1'
-      #- SPRING_DATA_MONGODB_DATABASE=store
+      - 'SPRING_DATA_MONGODB_URI=mongodb://store-mongodb:27017/store'
+      - SPRING_DATA_MONGODB_DATABASE=store
       - 'SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster'
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=internal
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=internal
@@ -199,9 +194,6 @@ services:
       - "27017"
     volumes:
       - /opt/volumes/mongodb2:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
     networks:
       - proxy
 
@@ -214,8 +206,6 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: teste
       ME_CONFIG_MONGODB_SERVER: store-mongodb
       ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: root
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
     depends_on:
       - store-mongodb
